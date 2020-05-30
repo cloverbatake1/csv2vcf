@@ -69,6 +69,9 @@ if fCsv2Vcf == False:
 
   for i in range(len(lines)):
     if re.search(r';?ENCODING=QUOTED-PRINTABLE', lines[i]): # QUOTED-PRINTABLE to UTF-8
+      if re.search(r'=[\r\n]*$', lines[i]): # Continuation line
+        lines[i] = re.sub(r'=[\r\n]*$', '', lines[i]) + lines[i+1] # remove '=' at tail, then concatinate
+        lines[i+1] = ""
       lines[i] = re.sub(r';?ENCODING=QUOTED-PRINTABLE', '', lines[i])
       lines[i] = re.sub(r'(=[0-9a-fA-F]{2}){1,}', lambda m: quopri.decodestring(m.group()).decode(), lines[i])
     if re.search(r'^(TEL|EMAIL|ADR)', lines[i]):
@@ -100,12 +103,12 @@ if fCsv2Vcf == False:
       match = re.search(r':([^;]+)', line)
       lst[3] = match.group(1)
     elif line.startswith('TEL'):
-      match = re.search(r';(Work|Home|Mobile).*:([- 0-9()]+)', line)
+      match = re.search(r';(Work|Home|Mobile|X-Mobile).*:([- 0-9()]+)', line)
       lst[22+iTel] = match.group(1)
       lst[23+iTel] = match.group(2)
       iTel += 2
     elif line.startswith('EMAIL'):
-      match = re.search(r';(Work|Home|Mobile).*:(\S+@\S+)', line)
+      match = re.search(r';(Work|Home|Mobile|X-Mobile).*:(\S+@\S+)', line)
       lst[4+iEmail] = match.group(1)
       lst[5+iEmail] = match.group(2)
       iEmail += 2
