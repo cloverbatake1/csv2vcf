@@ -1,4 +1,5 @@
-# coding: UTF-8
+# csv2vcf : CSV <-> Contacts(Android) convertor
+# usage: csv2vdf.exeを起動し、csvかvcfかを選択した後、sourceとdestinationのfileを指定する。
 
 import tkinter.filedialog as fd
 import re
@@ -56,10 +57,13 @@ termGmail = [
 
 inFilename = fd.askopenfilename(filetypes = [('input vcf file','*.vcf'), ('input csv file','*.csv')])
 fCsv2Vcf = inFilename.lower().endswith('csv')
-inFile = open(inFilename, mode='r', encoding='shift-jis' if fCsv2Vcf else 'utf-8')
+#inFile = open(inFilename, mode='r', encoding='shift-jis' if fCsv2Vcf else 'utf-8')
+inFile = open(inFilename, mode='r', encoding='utf_8_sig')
 
 outFilename = fd.asksaveasfilename(filetypes = [('vcf file','*.vcf')] if fCsv2Vcf else [('csv file','*.csv')]) 
-file = open(outFilename, mode='w', encoding='utf-8' if fCsv2Vcf else 'shift-jis')
+#file = open(outFilename, mode='w', encoding='utf-8' if fCsv2Vcf else 'shift-jis')
+#file = open(outFilename, mode='w', encoding='utf_8_sig')
+file = open(outFilename, mode='w', encoding='utf-8' if fCsv2Vcf else 'utf_8_sig')
 
 
 if fCsv2Vcf == False:
@@ -73,7 +77,7 @@ if fCsv2Vcf == False:
         lines[i] = re.sub(r'=[\r\n]*$', '', lines[i]) + lines[i+1] # remove '=' at tail, then concatinate
         lines[i+1] = ""
       lines[i] = re.sub(r';?ENCODING=QUOTED-PRINTABLE', '', lines[i])
-      lines[i] = re.sub(r'(=[0-9a-fA-F]{2}){1,}', lambda m: quopri.decodestring(m.group()).decode(), lines[i])
+      lines[i] = re.sub(r'(=[0-9a-fA-F]{2}){1,}', lambda m: quopri.decodestring(m.group()).decode(encoding="utf-8"), lines[i])
     if re.search(r'^(TEL|EMAIL|ADR)', lines[i]):
       lines[i] = re.sub(r';WORK', ';Work', lines[i])
       lines[i] = re.sub(r';HOME', ';Home', lines[i])
